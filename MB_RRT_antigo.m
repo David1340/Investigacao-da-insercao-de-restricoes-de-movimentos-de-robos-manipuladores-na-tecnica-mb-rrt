@@ -63,4 +63,4 @@ for u = 1:U
   erro = Inf;
 end
 mean(kk)
-vezes / U
+vezes / U * 100

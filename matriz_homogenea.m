@@ -1,4 +1,4 @@
-function [ T ] = matriz_homogenea( d,a,alpha,theta)
+function [ T ] = matriz_homogenea(d,a,alpha,theta)
 %UNTITLED2 Summary of this function goes here
 %   Detailed explanation goes here
 T = zeros(4,4);

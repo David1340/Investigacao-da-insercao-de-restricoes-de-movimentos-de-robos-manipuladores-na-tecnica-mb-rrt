@@ -1,7 +1,8 @@
+%% MB-RRT for planar robot
 clc
 clear
 close all
-
+%%
 %parâmetros do manipulador
 DH = [0,10,0,0]; %d , a, alpha, theta
 n = 4; %número de juntas do manipulador
@@ -19,7 +20,7 @@ figure()
 plot(root(1),root(2),'d'); %plot da base
 hold on
 plot(posD(1),posD(2),'*','linewidth',5); %plot da posição desejada
-legend('root','destino')
+legend('root','destino','AutoUpdate','off')
 erro = Inf; %erro inicial
 P = root; %árvore
 color = ['b','g','r','c','m','y','k']; %diferentes cores

@@ -70,9 +70,6 @@ for rep = 1:repeticoes
         P = [P, [Xnew;zeros(3,1);i+1;pos(pos2)]];
         
       elseif(i ==7)
-        if(k == 63)
-          oi = 1;
-        end
         Xrand = posD;
         %% Projetanto ponto no plano
         A = P(:,P(8,end));
@@ -98,7 +95,6 @@ for rep = 1:repeticoes
       end
     end
     if(erro < erro_min)
-%       convergiu(rep) = 1;
       break
     end
   end

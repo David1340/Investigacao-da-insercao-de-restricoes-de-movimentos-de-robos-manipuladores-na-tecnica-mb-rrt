@@ -1,6 +1,6 @@
 function [q] = angulos(p)
-%UNTITLED3 Summary of this function goes here
-%   Detailed explanation goes here
+% Cálculo os ângulos a partir da especificação da posição das juntas
+% para o pioneer7DOF
 % Atualmente tem problema com pontos colineares
 n = size(p,2)-1;
 q = zeros(n,1);
@@ -59,4 +59,8 @@ for i = 1:n
   end
   
 end
-
+[p2,juntas] = cinematica_direta(q);
+p2 = [juntas(1:3,:) p2(1:3)];
+if(sqrt((p2(:,end) - p(:,end)).^2) > 10^-4)
+  q(end) = -q(end);
+end

@@ -110,7 +110,7 @@ for rep = 1:repeticoes
   end
   
   P2 = P2(1:3,end:-1:1);
-  q = angulos2(P2);
+  q = angulos(P2);
   %% se quiser testar
   [p,juntas] = cinematica_direta(q);
   P = [juntas(1:3,:) p(1:3)];

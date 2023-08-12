@@ -1,4 +1,4 @@
-%% MB-RRT for planar robot
+%% MB-RRT para o planar robot
 clc
 clear
 close all

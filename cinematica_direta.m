@@ -1,6 +1,5 @@
 function [p,p2] = cinematica_direta(q)
-%UNTITLED8 Summary of this function goes here
-%   Detailed explanation goes here
+% Calcula a cinemática direta do pioneer7dof
 [d,a,alpha,theta,p_n] = getDH_paramaters(q);
 elos = [0.05,0.075,0.075,0.0725,0.0725,0.075,0.075];
 o = [0;0;0;1];

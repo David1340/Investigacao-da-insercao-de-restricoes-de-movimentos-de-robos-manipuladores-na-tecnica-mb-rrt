@@ -1,4 +1,6 @@
 function [d,a,alpha,theta,p_n] = getDH_paramaters(q)
+%% Parâmetros de DH do pioneer7dof
+
 elos = [0.075+0.05,0.075,0.075,0.0725,0.0725,0.075];
 
 d = [elos(1),0,elos(2) + elos(3),0,elos(4)+elos(5),0,0];

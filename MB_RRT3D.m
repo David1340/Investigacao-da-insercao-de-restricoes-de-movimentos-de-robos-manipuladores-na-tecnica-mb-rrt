@@ -137,7 +137,7 @@ xlabel('x')
 ylabel('y')
 
 P2 = P2(1:3,end:-1:1);
-q = angulos2(P2);
+q = angulos(P2);
 % q(end) = -q(end)
 [p,juntas] = cinematica_direta(q);
 P = [juntas(1:3,:) p(1:3)]

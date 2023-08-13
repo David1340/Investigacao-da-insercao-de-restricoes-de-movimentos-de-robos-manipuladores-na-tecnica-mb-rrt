@@ -1,7 +1,7 @@
 function [d,a,alpha,theta,p_n] = getDH_paramaters2(q)
 %% Parâmetros de DH do robô 4DOF
 
-elos = [0.075,0.075,0.075,0.0725];
+elos = [0.075,0.075,0.075,0.075];
 
 d = [0,0,0,0];
 a = [-elos(1),-elos(2),-elos(3),-elos(4)];

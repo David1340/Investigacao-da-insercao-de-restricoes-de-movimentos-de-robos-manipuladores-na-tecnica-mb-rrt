@@ -1,23 +1,24 @@
-%% MB-RRT for 4DOF manipulator
+%% MB-RRT for 6DOF manipulator
 clc
 clear
 close all
 % rng(2);
 %% Parâmetros do robô
-alpha = [pi/2 ,-pi/2, pi/2, 0];
-d = [0.075,0.075,0.075,0.075]; %comprimento do elos
+alpha = [pi/2,-pi/2,pi/2,-pi/2,pi/2,0];
+d = [0.075,0.075,0.075,0.075,0.075,0.075]; %comprimento do elos
 root = [0;0;0;0;0;1;0;0]; %x,y,z,eixo de rotação, índice da cadeira, nó pai 
-n = 4; %número de juntas do manipulador
+n = 6; %número de juntas do manipulador
 r = cumsum(d(end:-1:1)); %raio das circunferências em volta do destino
 r = [r(end-1:-1:1),0];
 %% configuração do experimento
+erro_min = 0.001;
 repeticoes = 1000;
 K = 1000; %número máximo de iteração
 ks = [];
 for rep = 1:repeticoes
   rep
-  q = -pi + pi*rand(4,1);
-  [posD,juntas] = cinematica_direta2(q); %posição desejada
+  q = -pi + pi*rand(n,1);
+  [posD,juntas] = cinematica_direta3(q); %posição desejada
   posD = posD(1:3);
   Xgoal = posD;
   %% Inicialzação da MB-RRT
@@ -28,7 +29,7 @@ for rep = 1:repeticoes
     for i = 1:n
       th = rand(1,1);
       fi = rand(1,1);
-      if(i == 1 | i == 3) %Se for Hinge
+      if(i == 1 | i == 3 | i == 5) %Se for Hinge
         raio = r(i+1); % comprimento da cadeia entre a junta superior até o efetuador
         Xrand  = [raio*sin(2*pi*fi)*cos(2*pi*th);
           raio*sin(2*pi*fi)*sin(2*pi*th);
@@ -49,7 +50,7 @@ for rep = 1:repeticoes
         p2 = p;
         %% Vnew
         Vnew = rotacionar_vetor(normal,-v,alpha(i)); %alpha1
-        P = [P, [Xnew;Vnew;i;size(P,2)]];
+        P = [P, [Xnew;Vnew;i;pos(pos2)]];
         %%
         p = Xnew;
         normal = Vnew;
@@ -64,11 +65,30 @@ for rep = 1:repeticoes
         erro = sqrt(sum((posD -P(1:3,end)).^2));
       end
     end
-    if(erro < 0.001)
-      ks = [ks k];
+    if(erro < erro_min)
+%       ks = [ks k];
       break
     end
   end
+  
+  p0 = P(:,end);
+  P2 = p0;
+  
+  for i = 1:n
+    p0 = P(:,p0(8));
+    P2 = [P2 p0];
+  end
+  V2 = P2(4:6,end:-1:1);
+  P2 = P2(1:3,end:-1:1);
+  q = angulos2(P2);
+  %% se quiser testar
+  [p,juntas] = cinematica_direta3(q);
+  P = [juntas(1:3,:) p(1:3)];
+  erro = sqrt(sum((posD -P(1:3,end)).^2));
+  if(erro < erro_min)
+    ks = [ks k];
+  end
+  
 %   k
 %   erro
 end

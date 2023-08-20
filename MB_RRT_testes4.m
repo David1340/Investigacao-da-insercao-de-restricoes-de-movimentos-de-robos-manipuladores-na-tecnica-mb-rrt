@@ -27,13 +27,13 @@ for rep = 1:repeticoes
   
   for k = 1:K
     for i = 1:n
-      th = rand(1,1);
-      fi = rand(1,1);
-      if(i == 1 | i == 3 | i == 5) %Se for Hinge
+      th = 2*pi*rand(1,1);
+      fi = 2*pi*rand(1,1);
+      if(i < n) %Se for Hinge
         raio = r(i+1); % comprimento da cadeia entre a junta superior até o efetuador
-        Xrand  = [raio*sin(2*pi*fi)*cos(2*pi*th);
-          raio*sin(2*pi*fi)*sin(2*pi*th);
-          raio*cos(2*pi*fi)]; %ponto aleatório na esfera
+        Xrand  = [raio*sin(fi)*cos(th);
+          raio*sin(fi)*sin(th);
+          raio*cos(fi)]; %ponto aleatório na esfera
         Xrand = Xrand + posD; %desloca o centro da esfera
         pos = find(P(7,:) == i-1); %encontra as colunas dos nós de índice i-1
         p = P(1:6,pos);

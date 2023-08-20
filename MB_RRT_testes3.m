@@ -26,8 +26,8 @@ for rep = 1:repeticoes
   
   for k = 1:K
     for i = 1:n
-      th = rand(1,1);
-      fi = rand(1,1);
+      th = 2*pi*rand(1,1);
+      fi = 2*pi*rand(1,1);
       if(i == 1 | i == 3) %Se for Hinge
         raio = r(i+1); % comprimento da cadeia entre a junta superior até o efetuador
         Xrand  = [raio*sin(2*pi*fi)*cos(2*pi*th);

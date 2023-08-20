@@ -1,4 +1,4 @@
-function saida = plot_junta_revolucao(A, p, c, h, r, cor, offset)
+function [saida] = plot_junta_revolucao(A, p, c, h, r, cor, offset)
     % A matriz de Rotação, p origem da junta no seu sistema de coordenadas, c eixo do
 
     if nargin < 7
@@ -18,7 +18,7 @@ function saida = plot_junta_revolucao(A, p, c, h, r, cor, offset)
         x = (r * cos(theta) + p(1, 1)) * A(1, 1) + (r * sin(theta) + p(2, 1)) * A(1, 2) + (z + p(3, 1)) * A(1, 3) + ones(size(z)) * A(1, 4);
         y = (r * cos(theta) + p(1, 1)) * A(2, 1) + (r * sin(theta) + p(2, 1)) * A(2, 2) + (z + p(3, 1)) * A(2, 3) + ones(size(z)) * A(2, 4);
         z = (r * cos(theta) + p(1, 1)) * A(3, 1) + (r * sin(theta) + p(2, 1)) * A(3, 2) + (z + p(3, 1)) * A(3, 3) + ones(size(z)) * A(3, 4);
-        saida = surf(x, y, z, 'FaceColor', cor, 'EdgeColor', 'none', 'FaceAlpha', 1);
+        saida = surf(x, y, z, 'FaceColor',cor, 'EdgeColor', 'none', 'FaceAlpha', 1);
         
     elseif c == 'y'
         y = linspace(-h, h, numel(theta)) + offset; % y de -h a h com o numero de elementos iguais ao de theta

@@ -28,16 +28,17 @@ Xgoal = posD;
 %% Inicialzação da MB-RRT
 erro = Inf; %erro inicial
 G = root; %árvore
-Gq = [];
 %% Plot inicial
 A = eye(4);
 plot_junta_revolucao(A,[0;0;-h/2],'z',h,radius,'g');
-xlim([-0.3,0.3])
+% xlim([-0.2,0.6])
 xlabel('x')
-ylim([-0.2,0.4])
+% ylim([-0.2,0.6])
 ylabel('y')
-zlim([-0.3,0.3])
+zlim([-0.4,0.4])
+axis equal
 zlabel('z')
+title("Manipulator-Based Rapidly Random Tree")
 hold on
 scatter3(Xgoal(1),Xgoal(2),Xgoal(3),'r','filled','linewidth',3)
 
@@ -113,7 +114,6 @@ for k = 1:K
         if(q_i <= limites_superior(i+1) & q_i >= limites_inferior(i+1))
           %% adição do nó 1 na árvore
           G = [G, [P_new;V_new;i;idc_parent]];
-          Gq = [Gq [q_i;size(G,2)]];
           %% Plot do primeiro ponto
           y = V_new;
           x = G(4:6,idc_parent);

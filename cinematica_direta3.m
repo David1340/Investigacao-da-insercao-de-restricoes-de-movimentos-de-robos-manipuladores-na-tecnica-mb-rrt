@@ -10,6 +10,7 @@ p4_4 = o;
 p5_5 = o;
 p6_6 = o;
 
+
 A1 = matriz_homogenea(d(1),a(1),alpha(1),theta(1));
 A2 = matriz_homogenea(d(2),a(2),alpha(2),theta(2));
 A3 = matriz_homogenea(d(3),a(3),alpha(3),theta(3));

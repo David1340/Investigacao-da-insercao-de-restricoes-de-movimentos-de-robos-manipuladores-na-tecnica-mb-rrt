@@ -21,7 +21,7 @@ function [saida] = plot_junta_revolucao(A, p, c, h, r, cor, offset)
         saida = surf(x, y, z, 'FaceColor',cor, 'EdgeColor', 'none', 'FaceAlpha', 1);
         
     elseif c == 'y'
-        y = linspace(-h, h, numel(theta)) + offset; % y de -h a h com o numero de elementos iguais ao de theta
+        y = linspace(0, h, numel(theta)) + offset; % y de -h a h com o numero de elementos iguais ao de theta
         [y, theta] = meshgrid(y, theta); % transforma em vetores 2D por causa do plot de superficie
         
         % [x, y, z].T = A * ([x, y, z].T + p)
@@ -31,7 +31,7 @@ function [saida] = plot_junta_revolucao(A, p, c, h, r, cor, offset)
         saida = surf(x, y, z, 'FaceColor', cor, 'EdgeColor', 'none', 'FaceAlpha', 1);
         
     elseif c == 'x'
-        x = linspace(-h, h, numel(theta)) + offset; % x de -h a h com o numero de elementos iguais ao de theta
+        x = linspace(0, h, numel(theta)) + offset; % x de -h a h com o numero de elementos iguais ao de theta
         [x, theta] = meshgrid(x, theta); % transforma em vetores 2D por causa do plot de superficie
         
         % [x, y, z].T = A * ([x, y, z].T + p)
@@ -41,3 +41,5 @@ function [saida] = plot_junta_revolucao(A, p, c, h, r, cor, offset)
         saida = surf(x, y, z, 'FaceColor', cor, 'EdgeColor', 'none', 'FaceAlpha', 1);
     end
 end
+
+

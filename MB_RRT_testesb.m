@@ -22,6 +22,7 @@ K = 1000; %número máximo de iteração
 qrand = -pi + 2*pi*rand(7,1);
 [posD,juntas,eixos] = cinematica_direta(qrand);
 posD = posD(1:3); %posição desejada
+posD = [0;-0.15;0.15];
 Xgoal = posD;
 
 
@@ -43,7 +44,7 @@ title("Manipulator-Based Rapidly Random Tree")
 hold on
 scatter3(Xgoal(1),Xgoal(2),Xgoal(3),'r','filled','linewidth',3)
 
-ambiente
+ambiente2
 legend("Base","Destino","Obstáculos",'AutoUpdate','off')
 
 plot_esfera(P_new,2*radius,color,1);
@@ -66,6 +67,11 @@ for k = 1:K
       P_rand = P_rand + posD; %desloca o centro da esfera
       
       idcs_parents = find(G(7,:) == i); %encontra os nós de índice i
+      
+      if(isempty(idcs_parents))
+        continue  
+      end
+      
       g = G(1:3,idcs_parents);
       [valor idc_parent] = min(abs(distancias(P_rand,g) - (d(i)+d(i+1)))); %nós mais próximo
       idc_parent = idcs_parents(idc_parent);
@@ -73,6 +79,28 @@ for k = 1:K
       V_new = (P_rand - P_parent)/norm(P_rand - P_parent);
       P_new = d(i)*V_new + P_parent;
       P_new2 = d(i+1)*V_new + P_new;
+      %% checagem de colisão 1
+      colidiu = 0;
+      for e = esferas
+        if(deteccao_de_colisao(P_parent,P_new,e.centro,raio_esferas + h))
+          colidiu = 1;
+          break;
+        end 
+      end
+      if(colidiu)
+        continue
+      end
+      %% checagem de colisão 2
+      colidiu = 0;
+      for e = esferas
+        if(deteccao_de_colisao(P_new,P_new2,e.centro,raio_esferas + h))
+          colidiu = 1;
+          break;
+        end 
+      end
+      if(colidiu)
+        continue
+      end
       %% Adição do primeiro nó da árvore
       G = [G, [P_new;V_new;i+1;idc_parent]];
       %% Plot do primeiro ponto
@@ -107,13 +135,30 @@ for k = 1:K
       P_rand = P_rand + posD; %desloca o centro da esfera
       
       idcs_parents = find(G(7,:) == i); %encontra as colunas dos nós de índice i
+      
+      if(isempty(idcs_parents))
+        continue  
+      end
+      
       g = G(1:3,idcs_parents);
+      
       [valor idc_parent] = min(abs(distancias(P_rand,g) - d(i)));
       idc_parent = idcs_parents(idc_parent);
       P_parent = G(1:3,idc_parent);
       
       v = (P_rand - P_parent)/norm(P_rand - P_parent);
       P_new = d(i)*v + P_parent;
+      %% checagem de colisão
+      colidiu = 0;
+      for e = esferas
+        if(deteccao_de_colisao(P_parent,P_new,e.centro,raio_esferas + h))
+          colidiu = 1;
+          break;
+        end 
+      end
+      if(colidiu)
+        continue
+      end 
       %% Adicionando nó a árvore
       G = [G, [P_new;zeros(3,1);i+1;idc_parent]];
       %% Plot do nó na árvore
@@ -122,6 +167,9 @@ for k = 1:K
       plot_esfera(P_new,2*radius,color,1);
       pause(0.1)
     elseif(i == 7)
+      if(~(G(7,end) == i))
+        continue   
+      end
       P_rand = posD;
       %% Projetanto ponto no plano
       A = G(:,G(8,end));
@@ -139,6 +187,17 @@ for k = 1:K
       P_parent = G(1:3,end);
       v = (P_rand - P_parent)/norm(P_rand - P_parent);
       P_new = 0.075*v + P_parent;
+      %% checagem de colisão 1
+      colidiu = 0;
+      for e = esferas
+        if(deteccao_de_colisao(P_parent,P_new,e.centro,raio_esferas + h))
+          colidiu = 1;
+          break;
+        end 
+      end
+      if(colidiu)
+        continue
+      end
       %% Adição do nó na árvore
       G = [G, [P_new;zeros(3,1);i+1;size(G,2)]];
       %% Plot do nó na árvore

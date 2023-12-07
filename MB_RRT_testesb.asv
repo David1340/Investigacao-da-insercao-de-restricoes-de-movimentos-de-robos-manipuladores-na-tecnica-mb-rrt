@@ -135,17 +135,13 @@ for k = 1:K
       end
       
       %% Checagem do ângulo 2
-      V_ref = V_grandparent;    
-      V_aux = P_new - P_parent;
-      V_aux = V_aux/norm(V_aux);
-      
-      v = rotacionar_vetor(V_ref,V_parent,pi/2);
-      
-      q = acos(V_aux'*V_ref);
-      if(V_aux'*v < 0)
+             
+      v = rotacionar_vetor(V_ref,V_grandparent,pi/2);
+      q = acos(V_parent'*V_ref);
+      if(V_parent'*v < 0)
         q = -q;
       end
-      if(q > limites_superior(i) | q < limites_inferior(i))
+      if(q > limites_superior(i-1) | q < limites_inferior(i-1))
         continue
       end
       %% Adição do primeiro nó da árvore

@@ -4,8 +4,8 @@ clear
 close all
 
 %% Parâmetros do robô
-limites_superior = [pi/2,pi/2,pi/2,pi/2,pi/2,pi/2,pi/2];
-limites_inferior = -[pi/2,pi/2,pi/2,pi/2,pi/2,pi/2,pi/2];
+limites_superior = [pi/2,pi/2,pi/2,pi/2,pi/2,pi/2,3*pi/2];
+limites_inferior = -[pi/2,pi/2,pi/2,pi/2,pi/2,pi/2,3*pi/2];
 radius = 0.005; %ráio dos elos do robô
 h = 0.025;
 color = [0.1 0.1 0.1]; %cor do robô 
@@ -22,7 +22,7 @@ K = 1000; %número máximo de iteração
 qrand = -pi/2 + pi*rand(7,1);
 [posD,juntas,eixos] = cinematica_direta(qrand);
 posD = posD(1:3); %posição desejada
-posD = [0;-0.15;0.15];
+posD = [0;-0.2;0.2];
 Xgoal = posD;
 
 
@@ -32,7 +32,7 @@ G = root; %árvore
 P_new = d(1)*G(4:6,1) + G(1:3,1); %primeira junta é fixa devido a estrutura do manipulador
 G = [G, [P_new ; zeros(3,1);2;1]]; %ainda não sei o eixo de atuação
 
-%% Plot inicial
+%% plot inicial
 A = eye(4);
 plot_junta_revolucao(A,[0;0;-h/2],'z',h,radius,'g');
 xlabel('x')
@@ -105,7 +105,9 @@ for k = 1:K
       idc_grandparent = G(8,idc_parent);
       P_grandparent = G(1:3,idc_grandparent);
       v2 = P_grandparent - P_parent;
+      v2 = v2/norm(v2);
       v1 = P_new - P_parent;
+      v1 = v1/norm(v1);
       V_parent = cross(v1,v2);
       V_parent = V_parent/norm(V_parent);  
       V_grandparent = G(4:6,idc_grandparent);
@@ -120,7 +122,9 @@ for k = 1:K
         idc_great_greatgrandparent = G(8,idc_greatgrandparent);
         P_great_greatgrandparent = G(1:3,idc_great_greatgrandparent);
         v2 = P_great_greatgrandparent - P_greatgrandparent;
+        v2 = v2/norm(v2);
         v1 = P_grandparent - P_greatgrandparent;
+        v1 = v1/norm(v1);
         V_greatgrandparent = cross(v1,v2);
         V_greatgrandparent = V_greatgrandparent/norm(V_greatgrandparent);
         V_ref = V_greatgrandparent;
@@ -150,12 +154,14 @@ for k = 1:K
       end
       %% Adição do primeiro nó da árvore
       G = [G, [P_new;V_new;i+1;idc_parent]];
-      %% Plot do primeiro ponto
+      %% plot do primeiro ponto
       y = V_new;
       idc_grandparent = G(8,idc_parent);
       P_grandparent = G(1:3,idc_grandparent);
       v1 = P_grandparent - P_parent;
+      v1 = v1/norm(v1);
       v2 = P_new - P_parent;
+      v2 = v2/norm(v2);
       v = cross(v1,v2);
       v = v/norm(v);
       x = v;
@@ -168,7 +174,7 @@ for k = 1:K
       plot_junta_revolucao(A,[0;-h/2;0],'y',h,radius,color);
       %% Adição do segundo nó na árvore
       G = [G, [P_new2;zeros(3,1);i+2;size(G,2)]];
-      %% Plot do segundo nó
+      %% plot do segundo nó
       plot3([P_new(1) P_new2(1)],[P_new(2) P_new2(2)],[P_new(3) P_new2(3)]...
         ,'Color',color,'linewidth',2)
       plot_esfera(P_new2,2*radius,color,1);
@@ -206,9 +212,58 @@ for k = 1:K
       if(colidiu)
         continue
       end 
+      
+      %% Checagem do ângulo 1
+      idc_grandparent = G(8,idc_parent);
+      P_grandparent = G(1:3,idc_grandparent);
+      v2 = P_grandparent - P_parent;
+      v2 = v2/norm(v2);
+      v1 = P_new - P_parent;
+      v1 = v1/norm(v1);
+      V_parent = cross(v1,v2);
+      V_parent = V_parent/norm(V_parent);  
+      V_grandparent = G(4:6,idc_grandparent);
+            
+      idc_greatgrandparent = G(8,idc_grandparent);
+      P_greatgrandparent = G(1:3,idc_greatgrandparent);
+      
+      idc_great_greatgrandparent = G(8,idc_greatgrandparent);
+      P_great_greatgrandparent = G(1:3,idc_great_greatgrandparent);
+      v2 = P_great_greatgrandparent - P_greatgrandparent;
+      v2 = v2/norm(v2);
+      v1 = P_grandparent - P_greatgrandparent;
+      v1 = v1/norm(v1);
+      V_greatgrandparent = cross(v1,v2);
+      V_greatgrandparent = V_greatgrandparent/norm(V_greatgrandparent);
+      V_ref = V_greatgrandparent;
+
+      v = rotacionar_vetor(V_ref,V_grandparent,pi/2);
+      q = acos(V_parent'*V_ref);
+      if(V_parent'*v < 0)
+        q = -q;
+      end
+      if(q > limites_superior(i-1) | q < limites_inferior(i-1))
+        continue
+      end
+      
+      %% Checagem do ângulo 2
+      V_ref = V_grandparent;    
+      V_aux = P_new - P_parent;
+      V_aux = V_aux/norm(V_aux);
+      
+      v = rotacionar_vetor(V_ref,V_parent,pi/2);
+      
+      q = acos(V_aux'*V_ref);
+      if(V_aux'*v < 0)
+        q = -q;
+      end
+      if(q > limites_superior(i) | q < limites_inferior(i))
+        continue
+      end
+      
       %% Adicionando nó a árvore
       G = [G, [P_new;zeros(3,1);i+1;idc_parent]];
-      %% Plot do nó na árvore
+      %% plot do nó na árvore
       plot3([P_new(1) P_parent(1)],[P_new(2) P_parent(2)],[P_new(3) P_parent(3)]...
         ,'Color',color,'linewidth',2)
       plot_esfera(P_new,2*radius,color,1);
@@ -219,22 +274,24 @@ for k = 1:K
       end
       P_rand = posD;
       %% Projetanto ponto no plano
-      A = G(:,G(8,end));
-      B = G(:,A(8));
-      v1 = G(1:3,end) - A(1:3);
+      P_grandparent = G(:,G(8,end));
+      P_greatgrandparent = G(:,P_grandparent(8));
+      
+      v1 = G(1:3,end) - P_grandparent(1:3);
       v1 = v1/norm(v1);
-      v2 = B(1:3) - A(1:3);
+      v2 = P_greatgrandparent(1:3) - P_grandparent(1:3);
       v2 = v2/norm(v2);
-      v3 = cross(v2,v1);
-      v3 = v3/norm(v3);
-      normal = rotacionar_vetor(v3,v1,pi/2); %v3 em torno de v1
-      normal = normal/norm(normal);
-      P_rand = proj_ponto_plano(normal,G(1:3,end),P_rand);
+      V_grandparent = cross(v2,v1);
+      V_grandparent = V_grandparent/norm(V_grandparent);
+      
+      V_parent = rotacionar_vetor(V_grandparent,v1,pi/2); %v3 em torno de v1
+      V_parent = V_parent/norm(V_parent);
+      P_rand = proj_ponto_plano(V_parent,G(1:3,end),P_rand);
       %% MB-RRT padrão
       P_parent = G(1:3,end);
       v = (P_rand - P_parent)/norm(P_rand - P_parent);
-      P_new = 0.075*v + P_parent;
-      %% checagem de colisão 1
+      P_new = d(end)*v + P_parent;
+      %% checagem de colisão
       colidiu = 0;
       for e = esferas
         if(deteccao_de_colisao(P_parent,P_new,e.centro,raio_esferas + h))
@@ -245,9 +302,24 @@ for k = 1:K
       if(colidiu)
         continue
       end
+      %% checagem de ângulo
+      idc_grandparent = G(8,idc_parent);
+      P_grandparent = G(1:3,idc_grandparent);
+      
+      V_ref = P_parent - P_grandparent;
+      V_ref = V_ref/norm(V_ref);
+      
+      v = rotacionar_vetor(V_ref,V_grandparent,pi/2);
+      q = acos(V_parent'*V_ref);
+      if(V_parent'*v < 0)
+        q = -q;
+      end
+      if(q > limites_superior(i) | q < limites_inferior(i))
+        continue
+      end
       %% Adição do nó na árvore
       G = [G, [P_new;zeros(3,1);i+1;size(G,2)]];
-      %% Plot do nó na árvore
+      %% plot do nó na árvore
       plot3([P_new(1) P_parent(1)],[P_new(2) P_parent(2)],[P_new(3) P_parent(3)]...
         ,'Color',color,'linewidth',2)
       plot_esfera(P_new,2*radius,color,1);
@@ -278,7 +350,7 @@ if (erro < erro_min)
   q = angulos(P2);
   [p,juntas,eixos] = cinematica_direta(q);
   G = [juntas(1:3,:) p(1:3)];
-  %% Plot
+  %% plot
   for i = 1:7
     plot3([G(1,i) G(1,i+1)],[G(2,i) G(2,i+1)],[G(3,i) G(3,i+1)]...
       ,'g','linewidth',2)

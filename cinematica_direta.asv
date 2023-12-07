@@ -1,9 +1,9 @@
-function [efetuador,juntas,eixos] = cinematica_direta(q)
+function [efetuador,p2] = cinematica_direta(q)
 % Calcula a cinemática direta do pioneer7dof
 [d,a,alpha,theta,p_n] = getDH_paramaters(q);
 elos = [0.05,0.075,0.075,0.0725,0.0725,0.075,0.075];
 o = [0;0;0;1];
-p1_1 = [0;-elos(1)-elos(2);0;1];
+p1_1 = [0;-elos(1);0;1];
 p2_2 = o;
 p3_3 = [0;-elos(3);0;1];
 p4_4 = o;

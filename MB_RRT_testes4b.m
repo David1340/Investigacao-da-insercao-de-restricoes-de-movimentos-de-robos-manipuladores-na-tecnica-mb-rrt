@@ -48,7 +48,7 @@ legend("Base","Destino","Obstáculos",'AutoUpdate','off')
 %% Loop da MB-RRT
 for k = 1:K
   for i = 1:n
-    if(i < n) %Se for Hinge
+    if(i < n)
     %% Geração de p_rand
       th = 2*pi*rand(1,1);
       fi = 2*pi*rand(1,1);

@@ -1,11 +1,11 @@
-%% MB-RRT for 7DOF manipulator
+%% MB-RRT for 7DOF manipulator (configuração a)
 clc
 clear
 close all
 
 %% Parâmetros do robô
-limites_superior = [pi/2,pi/2,pi/2,pi/2,pi/2,pi/2,3*pi/2];
-limites_inferior = -[pi/2,pi/2,pi/2,pi/2,pi/2,pi/2,3*pi/2];
+limites_superior = [pi/2,pi/2,pi/2,pi/2,pi/2,pi/2,pi];
+limites_inferior = -[pi/2,pi/2,pi/2,pi/2,pi/2,pi/2,pi];
 radius = 0.005; %ráio dos elos do robô
 h = 0.025;
 color = [0.1 0.1 0.1]; %cor do robô 

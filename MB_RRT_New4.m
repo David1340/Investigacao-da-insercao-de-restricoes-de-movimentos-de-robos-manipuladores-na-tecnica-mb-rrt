@@ -155,7 +155,7 @@ for k = 1:K
       A(end,end) = 1;
       A(1:3,1:3) = [x y z];
       
-      pause(0.1)
+%       %pause(0.1)
       plot_junta_revolucao(A,[0;-h/2;0],'y',h,radius,color);
       plot3([P_new(1) P_parent(1)],[P_new(2) P_parent(2)],[P_new(3) P_parent(3)]...
         ,'Color',color,'linewidth',2)
@@ -174,7 +174,7 @@ for k = 1:K
       A(end,end) = 1;
       A(1:3,1:3) = [x y z];
       
-      pause(0.1)
+      %pause(0.1)
       if(i == n-1)
         scatter3(P_new2(1),P_new2(2),P_new2(3),'k','filled','linewidth',3)
       else

@@ -1,4 +1,5 @@
-%% MB-RRT for 7DOF manipulator (configuração a)
+%% MB-RRT for 7DOF manipulator 
+%configuração A
 clc
 clear
 close all
@@ -34,7 +35,7 @@ G = [G, [P_new ; zeros(3,1);2;1]]; %ainda não sei o eixo de atuação
 
 %% plot inicial
 A = eye(4);
-plot_junta_revolucao(A,[0;0;-h/2],'z',h,radius,'g');
+plot_junta_revolucao(A,[0;0;-h/2],'z',h,radius,'b');
 xlabel('x')
 ylabel('y')
 zlabel('z')
@@ -42,11 +43,10 @@ axis equal
 
 title("Manipulator-Based Rapidly Random Tree")
 hold on
-scatter3(Xgoal(1),Xgoal(2),Xgoal(3),'r','filled','linewidth',3)
+scatter3(Xgoal(1),Xgoal(2),Xgoal(3),'r','filled','linewidth',10)
 
 ambiente2
-legend("Base","Destino","Obstáculos",'AutoUpdate','off')
-
+legend("Solution", "$X_{new}$", "Obstacles", 'AutoUpdate', 'off', 'Interpreter', 'Latex')
 plot_esfera(P_new,2*radius,color,1);
 P_parent = G(1:3,1);
 plot3([P_new(1) P_parent(1)],[P_new(2) P_parent(2)],[P_new(3) P_parent(3)]...
@@ -353,7 +353,7 @@ if (erro < erro_min)
   %% plot
   for i = 1:7
     plot3([G(1,i) G(1,i+1)],[G(2,i) G(2,i+1)],[G(3,i) G(3,i+1)]...
-      ,'g','linewidth',2)
+      ,'b','linewidth',2)
     
   end
   
@@ -366,3 +366,4 @@ if (erro < erro_min)
   end
 
 end
+plot_esfera(P_new,2*radius,'r',1);

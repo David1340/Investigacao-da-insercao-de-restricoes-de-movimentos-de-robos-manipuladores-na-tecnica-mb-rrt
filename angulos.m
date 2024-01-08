@@ -61,7 +61,7 @@ for i = 1:n
 end
 [p2,juntas] = cinematica_direta(q);
 p2 = [juntas(1:3,:) p2(1:3)];
-erro_angulos = sqrt(sum((p2(:,end) - p(:,end)).^2))
+erro_angulos = sqrt(sum((p2(:,end) - p(:,end)).^2));
 if(erro_angulos > 10^-4)
   q(end) = -q(end);
 end

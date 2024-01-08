@@ -14,5 +14,5 @@ e8 = struct('raio',raio_esferas,'centro',[-0.08;-0.08;0.08]);
 esferas = [e1,e2,e3,e4,e5,e6,e7,e8];
 
 for e = esferas
-  plot_esfera(e.centro,e.raio,[0,0.5,0.5],0.3);
+  plot_esfera(e.centro,e.raio,[0,0.5,0.5],0.2);
 end

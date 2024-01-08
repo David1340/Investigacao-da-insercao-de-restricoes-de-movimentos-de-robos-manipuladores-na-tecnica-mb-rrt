@@ -31,7 +31,7 @@ erro = Inf; %erro inicial
 G = root; %árvore
 %% Plot inicial
 A = eye(4);
-plot_junta_revolucao(A,[0;0;-h/2],'z',h,radius,'g');
+plot_junta_revolucao(A,[0;0;-h/2],'z',h,radius,'b');
 % xlim([-0.2,0.6])
 xlabel('x')
 % ylim([-0.2,0.6])
@@ -44,7 +44,7 @@ hold on
 scatter3(Xgoal(1),Xgoal(2),Xgoal(3),'r','filled','linewidth',3)
 
 ambiente
-legend("Base","Destino","Obstáculos",'AutoUpdate','off')
+legend("Solution","Destino","Obstáculos",'AutoUpdate','off')
 %% Loop da MB-RRT
 for k = 1:K
   for i = 1:n
@@ -155,7 +155,7 @@ for k = 1:K
       A(end,end) = 1;
       A(1:3,1:3) = [x y z];
       
-%       %pause(0.1)
+      pause(0.1)
       plot_junta_revolucao(A,[0;-h/2;0],'y',h,radius,color);
       plot3([P_new(1) P_parent(1)],[P_new(2) P_parent(2)],[P_new(3) P_parent(3)]...
         ,'Color',color,'linewidth',2)
@@ -174,7 +174,7 @@ for k = 1:K
       A(end,end) = 1;
       A(1:3,1:3) = [x y z];
       
-      %pause(0.1)
+      pause(0.1)
       if(i == n-1)
         scatter3(P_new2(1),P_new2(2),P_new2(3),'k','filled','linewidth',3)
       else
@@ -211,9 +211,9 @@ if(erro < erro_min)
   A = eye(4);
   P_parent = P2(:,1);
   p_new = P2(:,2);
-  plot_junta_revolucao(A,[0;0;-h/2],'z',h,radius,'g');
+  plot_junta_revolucao(A,[0;0;-h/2],'z',h,radius,'b');
   plot3([p_new(1) P_parent(1)],[p_new(2) P_parent(2)],[p_new(3) P_parent(3)]...
-    ,'g','linewidth',3)
+    ,'b','linewidth',5)
   
   for i = 2:n
     y = V2(:,i);
@@ -227,14 +227,16 @@ if(erro < erro_min)
     A(end,end) = 1;
     A(1:3,1:3) = [x y z];
     plot3([p_new(1) P_parent(1)],[p_new(2) P_parent(2)],[p_new(3) P_parent(3)]...
-      ,'Color',[0,1,0],'linewidth',3)
-    plot_junta_revolucao(A,[0;-h/2;0],'y',h,radius,[0,1,0]);
+      ,'Color',[0,0,1],'linewidth',5)
+    plot_junta_revolucao(A,[0;-h/2;0],'y',h,radius,[0,0,1]);
   end
   P_parent = P2(:,end-1);
   p_new = P2(:,end);
   plot3([p_new(1) P_parent(1)],[p_new(2) P_parent(2)],[p_new(3) P_parent(3)]...
-    ,'g','linewidth',3)
-  scatter3(p_new(1),p_new(2),p_new(3),'g','filled','linewidth',3)
+    ,'b','linewidth',3)
+  if(i < n)
+    scatter3(p_new(1),p_new(2),p_new(3),'b','filled','linewidth',3)
+  end
   %% se quiser testar
   [p,juntas] = cinematica_direta3(q);
   G = [juntas(1:3,:) p(1:3)];

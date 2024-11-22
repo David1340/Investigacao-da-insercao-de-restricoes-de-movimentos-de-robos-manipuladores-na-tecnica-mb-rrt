@@ -23,7 +23,7 @@ K = 1000; %número máximo de iteração
 q = -pi/2 + pi*rand(n,1);
 [posD,juntas] = myF.CD_6DOF(q); %posição desejada
 posD = posD(1:3);
-posD = [0;-0.2;0.1];
+posD = [0;0.18;0.18];
 % posD = [0.162731746446267;0.109103956434472;0.105048882375395];
 Xgoal = posD;
 
@@ -42,7 +42,7 @@ title("Manipulator-Based Rapidly Random Tree")
 hold on
 scatter3(Xgoal(1),Xgoal(2),Xgoal(3),'r','filled','linewidth',3)
 
-Map2_6DOF
+Map3_6DOF
 legend("Solução","Destino","Obstáculos",'AutoUpdate','off')
 %% Loop da MB-RRT
 for k = 1:K

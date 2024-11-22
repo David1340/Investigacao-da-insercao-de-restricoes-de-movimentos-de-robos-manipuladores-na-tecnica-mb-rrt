@@ -23,7 +23,8 @@ K = 1000; %número máximo de iteração
 qrand = -pi/2 + pi*rand(7,1);
 [posD,juntas,eixos] = myF.CD_7DOF(qrand);
 posD = posD(1:3); %posição desejada
-posD = [0;-0.2;0.2];
+posD = [0;-0.3;0.3]; %Map 3
+% posD = [0;-0.2;0.2]; Map2
 Xgoal = posD;
 
 
@@ -45,7 +46,7 @@ title("Manipulator-Based Rapidly Random Tree")
 hold on
 scatter3(Xgoal(1),Xgoal(2),Xgoal(3),'r','filled','linewidth',10)
 
-Map2_7DOF
+Map3_7DOF
 legend("Solution", "$X_{new}$", "Obstacles", 'AutoUpdate', 'off', 'Interpreter', 'Latex')
 plot_esfera(P_new,2*radius,color,1);
 P_parent = G(1:3,1);

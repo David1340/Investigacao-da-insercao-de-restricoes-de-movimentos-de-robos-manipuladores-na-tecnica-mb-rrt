@@ -3,7 +3,7 @@
 clc
 clear
 close all
-
+rng(1)
 %% Parâmetros do robô
 limites_superior = [pi/2,pi/2,pi/2,pi/2,pi/2,pi/2];
 limites_inferior = -[pi/2,pi/2,pi/2,pi/2,pi/2,pi/2];
@@ -19,46 +19,33 @@ r = [r(end-1:-1:1),0];
 %% configuração do experimento
 erro_min = sum(d)/100;
 K = 1000; %número máximo de iteração
-
+Exps = 1000;
 %% Inicialzação da MB-RRT
 erro = Inf; %erro inicial
 G = root; %árvore
 %% Plot inicial
 A = eye(4);
-% plot_junta_revolucao(A,[0;0;-h/2],'z',h,radius,'b');
-% xlim([-0.2,0.6])
-% xlabel('x')
-% ylim([-0.2,0.6])
-% ylabel('y')
-% zlim([-0.4,0.4])
-% axis equal
-% zlabel('z')
-% title("Manipulator-Based Rapidly Random Tree")
-% hold on
-% scatter3(Xgoal(1),Xgoal(2),Xgoal(3),'r','filled','linewidth',3)
 
-ambiente
-esferas = [];
+Map2_6DOF
 close all
-% legend("Solution","Destino","Obstáculos",'AutoUpdate','off')
 %% Loop da MB-RRT
 taxa_convergiu = [];
 media_iteracao = [];
-Exps = 10000;
+
 for Exp = 1:Exps
   erro = Inf; %erro inicial
   G = root; %árvore
   
   qrand = limites_inferior + (limites_superior - limites_inferior).*rand(7,1);
   
-  [posD,juntas] = cinematica_direta3(qrand); %posição desejada
+  [posD,juntas] = myF.CD_6DOF(qrand); %posição desejada
   posD = posD(1:3);
-%   posD = [0;-0.2;0.1];
+  posD = [0;-0.2;0.1];
   Xgoal = posD;
   
   repeticao = Exp
   for k = 1:K
-    for i = 1:n
+    for i = 1:1:n
       if(i < n)
         %% Geração de p_rand
         th = 2*pi*rand(1,1);
@@ -77,22 +64,22 @@ for Exp = 1:Exps
         end
         g = G(1:6,idcs_parents); %nós de índice i-1
         
-        [valor idc_parent] = min(abs(distancias3(P_rand,g(1:3,:),g(4:6,:),d(i)) - d(i+1))); %nós mais próximo
+        [valor idc_parent] = min(abs(myF.distancias3(P_rand,g(1:3,:),g(4:6,:),d(i)) - d(i+1))); %nós mais próximo
         idc_parent = idcs_parents(idc_parent); %em G
         V_parent = G(4:6,idc_parent); %vetor
         P_parent = G(1:3,idc_parent);
         %% Projetanto ponto no plano
-        P_rand2 = proj_ponto_plano(V_parent,P_parent,P_rand);
+        P_rand2 = myF.proj_ponto_plano(V_parent,P_parent,P_rand);
         %% MB-RRT padrão
         v = (P_rand2 - P_parent)/norm(P_rand2 - P_parent);
         P_new = d(i)*v + P_parent;
         p2 = P_parent;
-        V_new = rotacionar_vetor(V_parent,-v,alpha(i)); %alpha1
+        V_new = myF.rot_vetor(V_parent,-v,alpha(i)); %alpha1
         
         %% checagem de colisão 1
         colidiu = 0;
         for e = esferas
-          if(deteccao_de_colisao(P_parent,P_new,e.centro,raio_esferas + h))
+          if(myF.colisao(P_parent,P_new,e.centro,raio_esferas + h))
             colidiu = 1;
             break;
           end
@@ -105,12 +92,12 @@ for Exp = 1:Exps
         normal = V_new;
         v = (P_rand - p)/norm(P_rand - p);
         
-        V_new2 = rotacionar_vetor(normal,-v,alpha(i+1));
+        V_new2 = myF.rot_vetor(normal,-v,alpha(i+1));
         P_new2 = d(i+1)*v + p;
         %% checagem de colisão 2
         colidiu = 0;
         for e = esferas
-          if(deteccao_de_colisao(P_new,P_new2,e.centro,raio_esferas + h))
+          if(myF.colisao(P_new,P_new2,e.centro,raio_esferas + h))
             colidiu = 1;
             break;
           end
@@ -128,7 +115,7 @@ for Exp = 1:Exps
           V_ref = P_parent - P_grandparent;
           V_ref = V_ref/norm(V_ref);
         end
-        v = rotacionar_vetor(V_ref,V_parent,pi/2); %vetor ortogonal a V_new
+        v = myF.rot_vetor(V_ref,V_parent,pi/2); %vetor ortogonal a V_new
         V_aux = P_new - P_parent;
         V_aux = V_aux/norm(V_aux);
         q_i = acos(V_aux'*V_ref);
@@ -143,7 +130,7 @@ for Exp = 1:Exps
         V_ref = P_new - P_parent;
         V_ref = V_ref/norm(V_ref);
         
-        v = rotacionar_vetor(V_ref,V_new,pi/2); %vetor ortogonal a V_new
+        v = myF.rot_vetor(V_ref,V_new,pi/2); %vetor ortogonal a V_new
         V_aux = P_new2 - P_new;
         V_aux = V_aux/norm(V_aux);
         q_i = acos(V_aux'*V_ref);
@@ -165,12 +152,7 @@ for Exp = 1:Exps
         A(1:3,end) = P_new;
         A(end,end) = 1;
         A(1:3,1:3) = [x y z];
-        
-        %       %pause(0.1)
-%         plot_junta_revolucao(A,[0;-h/2;0],'y',h,radius,color);
-%         plot3([P_new(1) P_parent(1)],[P_new(2) P_parent(2)],[P_new(3) P_parent(3)]...
-%           ,'Color',color,'linewidth',2)
-        
+       
         %% adição do nó 2 na árvore
         G = [G, [P_new2;V_new2;i+1;size(G,2)]];
         
@@ -185,16 +167,8 @@ for Exp = 1:Exps
         A(end,end) = 1;
         A(1:3,1:3) = [x y z];
         
-        %pause(0.1)
-        if(i == n-1)
-%           scatter3(P_new2(1),P_new2(2),P_new2(3),'k','filled','linewidth',3)
-        else
-%           plot_junta_revolucao(A,[0;-h/2;0],'y',h,radius,color);
-        end
-%         plot3([P_new2(1) P_new(1)],[P_new2(2) P_new(2)],[P_new2(3) P_new(3)]...
-%           ,'Color',color,'linewidth',2);
       end
-      if(i == n && G(7,end) == n)
+      if(G(7,end) == n)
         erro = sqrt(sum((posD -G(1:3,end)).^2));
       end
       
@@ -216,50 +190,21 @@ for Exp = 1:Exps
     end
     V2 = P2(4:6,end:-1:1);
     P2 = P2(1:3,end:-1:1);
-    q = angulos2(P2);
+    q = myF.angulos_6DOF(P2);
     
-    %% Plot
-    A = eye(4);
-    P_parent = P2(:,1);
-    p_new = P2(:,2);
-%     plot_junta_revolucao(A,[0;0;-h/2],'z',h,radius,'b');
-%     plot3([p_new(1) P_parent(1)],[p_new(2) P_parent(2)],[p_new(3) P_parent(3)]...
-%       ,'b','linewidth',5)
-    
-    for i = 2:n
-      y = V2(:,i);
-      x = V2(:,i-1);
-      z = cross(x,y);
-      
-      p_new = P2(:,i);
-      P_parent = P2(:,i-1);
-      
-      A(1:3,end) = p_new;
-      A(end,end) = 1;
-      A(1:3,1:3) = [x y z];
-%       plot3([p_new(1) P_parent(1)],[p_new(2) P_parent(2)],[p_new(3) P_parent(3)]...
-%         ,'Color',[0,0,1],'linewidth',5)
-%       plot_junta_revolucao(A,[0;-h/2;0],'y',h,radius,[0,0,1]);
-    end
-    P_parent = P2(:,end-1);
-    p_new = P2(:,end);
-%     plot3([p_new(1) P_parent(1)],[p_new(2) P_parent(2)],[p_new(3) P_parent(3)]...
-%       ,'b','linewidth',3)
-    if(i < n)
-%       scatter3(p_new(1),p_new(2),p_new(3),'b','filled','linewidth',3)
-    end
     %% se quiser testar
-    [p,juntas] = cinematica_direta3(q);
+    [p,juntas] = myF.CD_6DOF(q);
     G = [juntas(1:3,:) p(1:3)];
     erro = sqrt(sum((posD -G(1:3,end)).^2));
     if(erro < erro_min)
       convergiu = 1;
     else
-      conerviu = 0;
+      convergiu = 0;
+      erro2 = erro;
     end
-%     k
-%     erro
-%     angulos = q*(180/pi)
+  else
+    convergiu = 0;
+    erro3 = erro;
   end
   taxa_convergiu = [taxa_convergiu convergiu];
   media_iteracao = [media_iteracao k];

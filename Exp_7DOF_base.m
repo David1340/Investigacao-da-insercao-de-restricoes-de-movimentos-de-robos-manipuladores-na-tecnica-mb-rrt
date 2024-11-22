@@ -5,8 +5,8 @@ clear
 close all
 
 %% Parâmetros do robô
-limites_superior = [pi/2,pi/2,pi/2,pi/2,pi/2,pi/2,pi];
-limites_inferior = -[pi/2,pi/2,pi/2,pi/2,pi/2,pi/2,pi];
+limites_superior = [pi/2,pi/2,pi/2,pi/2,pi/2,pi/2,3*pi/4];
+limites_inferior = -[pi/2,pi/2,pi/2,pi/2,pi/2,pi/2,3*pi/4];
 radius = 0.005; %ráio dos elos do robô
 h = 0.025;
 color = [0.1 0.1 0.1]; %cor do robô 
@@ -17,11 +17,11 @@ r = cumsum(d(end:-1:1)); %raio das circunferências em volta do destino
 r = [r(end-1:-1:1),0];
 
 %% configuração do experimento
-erro_min = 0.001*10;
+erro_min = sum(d)/100;
 K = 1000; %número máximo de iteração
 
 qrand = -pi/2 + pi*rand(7,1);
-[posD,juntas,eixos] = cinematica_direta(qrand);
+[posD,juntas,eixos] = myF.CD_7DOF(qrand);
 posD = posD(1:3); %posição desejada
 posD = [0;-0.2;0.2];
 Xgoal = posD;
@@ -45,7 +45,7 @@ title("Manipulator-Based Rapidly Random Tree")
 hold on
 scatter3(Xgoal(1),Xgoal(2),Xgoal(3),'r','filled','linewidth',10)
 
-ambiente2
+Map2_7DOF
 legend("Solution", "$X_{new}$", "Obstacles", 'AutoUpdate', 'off', 'Interpreter', 'Latex')
 plot_esfera(P_new,2*radius,color,1);
 P_parent = G(1:3,1);
@@ -73,7 +73,7 @@ for k = 1:K
       end
       
       g = G(1:3,idcs_parents);
-      [valor idc_parent] = min(abs(distancias(P_rand,g) - (d(i)+d(i+1)))); %nós mais próximo
+      [valor idc_parent] = min(abs(myF.distancias(P_rand,g) - (d(i)+d(i+1)))); %nós mais próximo
       idc_parent = idcs_parents(idc_parent);
       P_parent = G(1:3,idc_parent);
       V_new = (P_rand - P_parent)/norm(P_rand - P_parent);
@@ -82,7 +82,7 @@ for k = 1:K
       %% checagem de colisão 1
       colidiu = 0;
       for e = esferas
-        if(deteccao_de_colisao(P_parent,P_new,e.centro,raio_esferas + h))
+        if(myF.colisao(P_parent,P_new,e.centro,raio_esferas + h))
           colidiu = 1;
           break;
         end 
@@ -93,7 +93,7 @@ for k = 1:K
       %% checagem de colisão 2
       colidiu = 0;
       for e = esferas
-        if(deteccao_de_colisao(P_new,P_new2,e.centro,raio_esferas + h))
+        if(myF.colisao(P_new,P_new2,e.centro,raio_esferas + h))
           colidiu = 1;
           break;
         end 
@@ -129,7 +129,7 @@ for k = 1:K
         V_greatgrandparent = V_greatgrandparent/norm(V_greatgrandparent);
         V_ref = V_greatgrandparent;
       end
-      v = rotacionar_vetor(V_ref,V_grandparent,pi/2);
+      v = myF.rot_vetor(V_ref,V_grandparent,pi/2);
       q = acos(V_parent'*V_ref);
       if(V_parent'*v < 0)
         q = -q;
@@ -143,7 +143,7 @@ for k = 1:K
       V_aux = P_new - P_parent;
       V_aux = V_aux/norm(V_aux);
       
-      v = rotacionar_vetor(V_ref,V_parent,pi/2);
+      v = myF.rot_vetor(V_ref,V_parent,pi/2);
       
       q = acos(V_aux'*V_ref);
       if(V_aux'*v < 0)
@@ -171,7 +171,8 @@ for k = 1:K
       A(1:3,end) = P_new;
       plot3([P_new(1) P_parent(1)],[P_new(2) P_parent(2)],[P_new(3) P_parent(3)]...
         ,'Color',color,'linewidth',2)
-      plot_junta_revolucao(A,[0;-h/2;0],'y',h,radius,color);
+      plot_esfera(P_new,2*radius,color,1);
+%       plot_junta_revolucao(A,[0;-h/2;0],'y',h,radius,color);
       %% Adição do segundo nó na árvore
       G = [G, [P_new2;zeros(3,1);i+2;size(G,2)]];
       %% plot do segundo nó
@@ -195,7 +196,7 @@ for k = 1:K
       
       g = G(1:3,idcs_parents);
       
-      [valor idc_parent] = min(abs(distancias(P_rand,g) - d(i)));
+      [valor idc_parent] = min(abs(myF.distancias(P_rand,g) - d(i)));
       idc_parent = idcs_parents(idc_parent);
       P_parent = G(1:3,idc_parent);
       
@@ -204,7 +205,7 @@ for k = 1:K
       %% checagem de colisão
       colidiu = 0;
       for e = esferas
-        if(deteccao_de_colisao(P_parent,P_new,e.centro,raio_esferas + h))
+        if(myF.colisao(P_parent,P_new,e.centro,raio_esferas + h))
           colidiu = 1;
           break;
         end 
@@ -237,7 +238,7 @@ for k = 1:K
       V_greatgrandparent = V_greatgrandparent/norm(V_greatgrandparent);
       V_ref = V_greatgrandparent;
 
-      v = rotacionar_vetor(V_ref,V_grandparent,pi/2);
+      v = myF.rot_vetor(V_ref,V_grandparent,pi/2);
       q = acos(V_parent'*V_ref);
       if(V_parent'*v < 0)
         q = -q;
@@ -251,7 +252,7 @@ for k = 1:K
       V_aux = P_new - P_parent;
       V_aux = V_aux/norm(V_aux);
       
-      v = rotacionar_vetor(V_ref,V_parent,pi/2);
+      v = myF.rot_vetor(V_ref,V_parent,pi/2);
       
       q = acos(V_aux'*V_ref);
       if(V_aux'*v < 0)
@@ -284,9 +285,9 @@ for k = 1:K
       V_grandparent = cross(v2,v1);
       V_grandparent = V_grandparent/norm(V_grandparent);
       
-      V_parent = rotacionar_vetor(V_grandparent,v1,pi/2); %v3 em torno de v1
+      V_parent = myF.rot_vetor(V_grandparent,v1,pi/2); %v3 em torno de v1
       V_parent = V_parent/norm(V_parent);
-      P_rand = proj_ponto_plano(V_parent,G(1:3,end),P_rand);
+      P_rand = myF.proj_ponto_plano(V_parent,G(1:3,end),P_rand);
       %% MB-RRT padrão
       P_parent = G(1:3,end);
       v = (P_rand - P_parent)/norm(P_rand - P_parent);
@@ -294,7 +295,7 @@ for k = 1:K
       %% checagem de colisão
       colidiu = 0;
       for e = esferas
-        if(deteccao_de_colisao(P_parent,P_new,e.centro,raio_esferas + h))
+        if(myF.colisao(P_parent,P_new,e.centro,raio_esferas + h))
           colidiu = 1;
           break;
         end 
@@ -309,7 +310,7 @@ for k = 1:K
       V_ref = P_parent - P_grandparent;
       V_ref = V_ref/norm(V_ref);
       
-      v = rotacionar_vetor(V_ref,V_grandparent,pi/2);
+      v = myF.rot_vetor(V_ref,V_grandparent,pi/2);
       q = acos(V_parent'*V_ref);
       if(V_parent'*v < 0)
         q = -q;
@@ -347,8 +348,8 @@ if (erro < erro_min)
   end
   
   P2 = P2(1:3,end:-1:1);
-  q = angulos(P2);
-  [p,juntas,eixos] = cinematica_direta(q);
+  q = myF.angulos_7DOF(P2);
+  [p,juntas,eixos] = myF.CD_7DOF(q);
   G = [juntas(1:3,:) p(1:3)];
   %% plot
   for i = 1:7
